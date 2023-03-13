@@ -1,0 +1,55 @@
+name: CI
+on: [push]
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    env:
+      CI: True
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN }}
+      - name: Set @mundibot as committer
+        run: |
+          git config --global user.name "mundibot"
+          git config --global user.email "tech@mundi.io"
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+      - name: Cache node modules
+        id: cache-yarn
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Set Release version
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Print Release version
+        run: echo ${{ env.RELEASE_VERSION }}
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v0.4.0
+        with:
+          credentials_json: '${{ secrets.NPM_REGISTRY_CREDENTIALS }}'
+      - name: Login to Artifact Registry
+        run: yarn run artifactregistry-login
+      - if: steps.cache-yarn.outputs.cache-hit != 'true'
+        name: List the state of node modules
+        continue-on-error: true
+        run: yarn list
+      - run: yarn install --frozen-lockfile --ignore-scripts
+      - name: Build packages.
+        run: yarn run build
+      - name: Running linter validation.
+        run: yarn run lint
+      - name: Running tests.
+        run: yarn run test
+      - run: echo "🍏 This job's status is ${{ job.status }}."
