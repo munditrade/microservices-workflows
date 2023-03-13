@@ -1,5 +1,15 @@
 name: CI
-on: [push]
+on:
+  workflow_call:
+    inputs:
+      PROJECT_NAME:
+        required: true
+        type: string
+    secrets:
+      GH_TOKEN:
+        required: true
+      NPM_REGISTRY_CREDENTIALS:
+        required: true
 jobs:
   ci:
     runs-on: ubuntu-latest

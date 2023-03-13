@@ -1,9 +1,17 @@
 name: Release
 on:
-  push:
-    branches:
-      - main
-      - beta
+  workflow_call:
+    inputs:
+      PROJECT_NAME:
+        required: true
+        type: string
+    secrets:
+      GH_TOKEN:
+        required: true
+      NPM_REGISTRY_CREDENTIALS:
+        required: true
+      INFRA_SERVICES_DOCKER:
+        required: true
 jobs:
   next-version:
     runs-on: ubuntu-latest
