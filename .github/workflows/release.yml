@@ -117,7 +117,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: gcr.io/prj-mundi-infra-services/${{ env.PROJECT_NAME }}:${{ needs.next-version.outputs.new-release-version }}
+          tags: gcr.io/prj-mundi-infra-services/${{ inputs.PROJECT_NAME }}:${{ needs.next-version.outputs.new-release-version }}
 
   semantic-release:
     name: Release semantic version
