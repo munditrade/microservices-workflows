@@ -18,28 +18,11 @@ jobs:
     env:
       CI: true
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup node
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-      - name: Cache node modules
-        id: cache-yarn
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - if: steps.cache-yarn.outputs.cache-hit != 'true'
-        name: List the state of node modules
-        continue-on-error: true
-        run: yarn list
+          cache: 'yarn'
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v0.4.0
         with:
@@ -48,7 +31,6 @@ jobs:
         run: yarn run artifactregistry-login
       - name: Install dependencies
         run: yarn install --frozen-lockfile --ignore-scripts
-        if: steps.cache-yarn.outputs.cache-hit != 'true'
       - run: npx semantic-release --dry-run
         id: get-next-version
         env:
@@ -66,37 +48,17 @@ jobs:
     needs: next-version
     if: needs.next-version.outputs.new-release-published == 'true'
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Setup node
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-      - name: Cache node modules
-        id: cache-yarn
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          cache: 'yarn'
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v0.4.0
         with:
           credentials_json: '${{ secrets.NPM_REGISTRY_CREDENTIALS }}'
       - name: Login to Artifact Registry
         run: yarn run artifactregistry-login
-      - if: ${{ steps.cache-yarn.outputs.cache-hit != 'true' }}
-        name: List the state of node modules
-        continue-on-error: true
-        run: yarn list
       - name: Install dependencies
         run: yarn install --frozen-lockfile --ignore-scripts
       - name: Build project and types
@@ -125,7 +87,7 @@ jobs:
     needs: [publish-image]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_TOKEN }}
@@ -133,23 +95,14 @@ jobs:
         run: |
           git config --global user.name "mundibot"
           git config --global user.email "tech@mundi.io"
-      - name: Setup node
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-      - name: Cache node modules
-        id: cache-yarn
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
+          cache: 'yarn'
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v0.4.0
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          credentials_json: '${{ secrets.NPM_REGISTRY_CREDENTIALS }}'
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v0.4.0
         with:
