@@ -91,6 +91,10 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
       - name: Set @mundibot as committer
         run: |
           git config --global user.name "mundibot"
@@ -109,10 +113,6 @@ jobs:
           credentials_json: '${{ secrets.NPM_REGISTRY_CREDENTIALS }}'
       - name: Login to Artifact Registry
         run: yarn run artifactregistry-login
-      - if: steps.cache-yarn.outputs.cache-hit != 'true'
-        name: List the state of node modules
-        continue-on-error: true
-        run: yarn list
       - run: yarn install --frozen-lockfile --ignore-scripts
       - name: Release
         run: npx semantic-release
