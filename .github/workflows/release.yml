@@ -61,8 +61,6 @@ jobs:
         run: yarn run artifactregistry-login
       - name: Install dependencies
         run: yarn install --frozen-lockfile --ignore-scripts
-      - name: Compress node_modules
-        run: tar -czf node_modules.tar.gz node_modules
       - name: Build project and types
         run: yarn tsc && yarn build
       - name: Set up QEMU
