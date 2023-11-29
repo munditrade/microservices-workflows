@@ -14,7 +14,7 @@ on:
         required: true
 jobs:
   next-version:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       CI: true
     steps:
@@ -41,7 +41,7 @@ jobs:
 
   publish-image:
     name: Publish artifacts
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 15
     env:
       CI: true
@@ -83,7 +83,7 @@ jobs:
 
   semantic-release:
     name: Release semantic version
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [publish-image]
     steps:
       - name: Checkout
