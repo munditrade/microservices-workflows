@@ -32,6 +32,12 @@ jobs:
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Print Release version
         run: echo ${{ env.RELEASE_VERSION }}
+      - name: Install Apache Pulsar client
+        run: |
+          wget --user-agent=Mozilla -O apache-pulsar-client.deb "https://archive.apache.org/dist/pulsar/pulsar-2.4.1/DEB/apache-pulsar-client.deb"
+          wget --user-agent=Mozilla -O apache-pulsar-client-dev.deb "https://archive.apache.org/dist/pulsar/pulsar-2.4.1/DEB/apache-pulsar-client-dev.deb"
+          sudo apt install -y ./apache-pulsar-client.deb
+          sudo apt install -y ./apache-pulsar-client-dev.deb
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v0.4.0
         with:
