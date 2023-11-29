@@ -38,7 +38,7 @@ jobs:
           credentials_json: '${{ secrets.NPM_REGISTRY_CREDENTIALS }}'
       - name: Login to Artifact Registry
         run: yarn run artifactregistry-login
-      - run: yarn install --frozen-lockfile --ignore-scripts
+      - run: yarn install --frozen-lockfile
       - name: Build packages.
         run: yarn run build
       - name: Running linter validation.
