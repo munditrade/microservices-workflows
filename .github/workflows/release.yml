@@ -60,7 +60,7 @@ jobs:
       - name: Login to Artifact Registry
         run: yarn run artifactregistry-login
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --ignore-scripts
+        run: yarn install --frozen-lockfile
       - name: Build project and types
         run: yarn tsc && yarn build
       - name: Set up QEMU
